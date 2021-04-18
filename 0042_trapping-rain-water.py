@@ -15,7 +15,10 @@ class Solution:
         height_left = height[left]
         height_right = height[right]
         while left < right:
-            # print(f'left: {left}, right: {right}, height: {height[left:right+1]}, trapped: {trapped}')
+            print(
+                f"left: {left}, right: {right}",
+                f"height: {height[left:right +1]}, trapped: {trapped}"
+            )
             if height_left < height_right:
                 left += 1
                 if height[left] > height_left:
