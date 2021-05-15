@@ -1,5 +1,4 @@
 import unittest
-import re
 '''
 'A' -> "1"
 'B' -> "2"
@@ -9,56 +8,57 @@ import re
 
 
 class Solution:
-    n = 10**9 + 7
-    mem = {"": 1}
+
+    def __init__(self):
+        self.n = 10**9 + 7
+        self.dictionary = dict()
+        self.dictionary['*'] = 9
+        for s in map(lambda i: f'{i}', range(1, 10)):
+            self.dictionary[s] = 1
+
+        self.dictionary['**'] = 15
+        self.dictionary['1*'] = 9
+        self.dictionary['2*'] = 6
+        for s in map(lambda i: f'*{i}', range(0, 7)):
+            self.dictionary[s] = 2
+        for s in map(lambda i: f'*{i}', range(7, 10)):
+            self.dictionary[s] = 1
+        for s in map(lambda i: f'1{i}', range(0, 10)):
+            self.dictionary[s] = 1
+        for s in map(lambda i: f'2{i}', range(0, 7)):
+            self.dictionary[s] = 1
 
     def numDecodings(self, s: str) -> int:
-        if s in self.mem:
-            return self.mem[s]
-        length = len(s)
-        if length == 1:
-            result = self.numDecodings1Char(s)
-            self.mem[s] = result
-            return result
+        self.mem = dict()
+        self.s = s
+        return self.dp(0)
+
+    def dp(self, start: int) -> int:
+        if start in self.mem:
+            return self.mem[start]
+
+        length = len(self.s) - start
+        if length < 1:
+            return 1
+
+        one_char = self.s[start]
+        if one_char in self.dictionary:
+            case1 = self.dictionary[one_char] * self.dp(start + 1)
         else:
-            # Case 1: Devide 3 piece 'a..b' + 'cd' + 'e...f'
-            case1 = self.numdecodings2Char(s[length//2-1:length//2+1])
-            if case1 > 0:
-                case1 *= self.numDecodings(s[:length//2-1])
-            if case1 > 0:
-                case1 *= self.numDecodings(s[length//2+1:])
+            case1 = 0
 
-            # Case 2: Devide 2 piece 'a..bc' + 'de...f'
-            case2 = self.numDecodings(s[:length//2])
-            if case2 > 0:
-                case2 *= self.numDecodings(s[length//2:])
-            result = (case1 + case2) % self.n
-            self.mem[s] = result
-            return result
+        if length < 2:
+            self.mem[start] = case1
+            return self.mem[start]
 
-    def numDecodings1Char(self, s: str) -> int:
-        if s == '*':
-            return 9
-        if re.search(r'^[1-9]$', s):
-            return 1
-        return 0
+        two_char = self.s[start:start+2]
+        if two_char in self.dictionary:
+            case2 = self.dictionary[two_char] * self.dp(start + 2)
+        else:
+            case2 = 0
 
-    def numdecodings2Char(self, s: str) -> int:
-        if s == '**':  # 11~19, 21~26
-            return 15
-        if re.search(r'^\*[0-6]$', s):
-            return 2
-        if re.search(r'^\*[7-9]$', s):
-            return 1
-        if s == '1*':
-            return 9
-        if s == '2*':
-            return 6
-        if re.search(r'^1[0-9]$', s):
-            return 1
-        if re.search(r'^2[0-6]$', s):
-            return 1
-        return 0
+        self.mem[start] = (case1 + case2) % self.n
+        return self.mem[start]
 
 
 class TestSolution(unittest.TestCase):
@@ -99,6 +99,31 @@ class TestSolution(unittest.TestCase):
             self.solution.numDecodings('**'),
             96
         )
+
+    def test07(self):
+        self.assertEqual(
+            self.solution.numDecodings("*********"),
+            291868912
+        )
+
+    def test08(self):
+        self.assertEqual(
+            self.solution.numDecodings('0***********'),
+            0
+        )
+
+    def test09(self):
+        self.assertEqual(
+            self.solution.numDecodings('***'),
+            999
+        )
+
+    def test10(self):
+        self.assertEqual(
+            self.solution.numDecodings('****'),
+            10431
+        )
+
 
 if __name__ == '__main__':
     unittest.main()
