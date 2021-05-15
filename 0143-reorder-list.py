@@ -6,33 +6,33 @@ class ListNode:
 
 
 class Solution:
-    def reorderList(self, head: ListNode) -> None:
+    def reorderList(self, head):
         """
-        Do not return anything, modify head in-place instead.
+        https://leetcode.com/problems/reorder-list/discuss/801883/Python-3-steps-to-success-explained
         Time Complexity: O(n)
-        Space Complexity: O(n)
+        Space Complexity: O(1)
         """
-        if head is None:
+        # step 1: find middle
+        if not head:
             return
+        slow, fast = head, head
+        while fast.next and fast.next.next:
+            slow = slow.next
+            fast = fast.next.next
 
-        stack = []
-        cur = head
-        while cur:
-            stack.append(cur)
-            cur = cur.next
+        # step 2: reverse second half
+        prev, curr = None, slow.next
+        while curr:
+            nextt = curr.next
+            curr.next = prev
+            prev = curr
+            curr = nextt
+        slow.next = None
 
-        asc_cur = head
-        while True:
-            asc_next = asc_cur.next
-            desc_cur = stack.pop()
-
-            if asc_cur == desc_cur:
-                asc_cur.next = None
-                return
-            asc_cur.next = desc_cur
-
-            if desc_cur == asc_next:
-                desc_cur.next = None
-                return
-            desc_cur.next = asc_next
-            asc_cur = asc_next
+        # step 3: merge lists
+        head1, head2 = head, prev
+        while head2:
+            nextt = head1.next
+            head1.next = head2
+            head1 = head2
+            head2 = nextt
