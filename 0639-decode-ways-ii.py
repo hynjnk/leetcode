@@ -10,7 +10,6 @@ import unittest
 class Solution:
 
     def __init__(self):
-        self.n = 10**9 + 7
         self.dictionary = dict()
         self.dictionary['*'] = 9
         for s in map(lambda i: f'{i}', range(1, 10)):
@@ -29,36 +28,16 @@ class Solution:
             self.dictionary[s] = 1
 
     def numDecodings(self, s: str) -> int:
-        self.mem = dict()
-        self.s = s
-        return self.dp(0)
+        # https://leetcode.com/problems/decode-ways-ii/discuss/105262/Python-6-lines-DP-solution
+        prev = 1
+        cur = self.dictionary.get(s[0], 0)
+        for i in range(1, len(s)):
+            case0 = self.dictionary.get(s[i-1:i+1], 0) * prev
+            case1 = self.dictionary.get(s[i], 0) * cur
 
-    def dp(self, start: int) -> int:
-        if start in self.mem:
-            return self.mem[start]
-
-        length = len(self.s) - start
-        if length < 1:
-            return 1
-
-        one_char = self.s[start]
-        if one_char in self.dictionary:
-            case1 = self.dictionary[one_char] * self.dp(start + 1)
-        else:
-            case1 = 0
-
-        if length < 2:
-            self.mem[start] = case1
-            return self.mem[start]
-
-        two_char = self.s[start:start+2]
-        if two_char in self.dictionary:
-            case2 = self.dictionary[two_char] * self.dp(start + 2)
-        else:
-            case2 = 0
-
-        self.mem[start] = (case1 + case2) % self.n
-        return self.mem[start]
+            prev = cur
+            cur = (case0 + case1) % 1000000007
+        return cur
 
 
 class TestSolution(unittest.TestCase):
