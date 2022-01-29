@@ -3,7 +3,7 @@ import unittest
 
 
 class Solution:
-    def jump(self, nums: List[int]) -> bool:
+    def jump(self, nums: List[int]) -> int:
         # O(N) Time
         # O(1) Space
 
